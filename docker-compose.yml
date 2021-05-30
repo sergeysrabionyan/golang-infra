@@ -1,0 +1,48 @@
+version: "3.8"
+
+services:
+
+  # Databases #
+
+  db:
+    image: postgres:11
+    container_name: db
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - ./volumes/db:/var/lib/postgresql/data
+    ports:
+      - ${DB_PUBLIC_PORT}
+    networks:
+      - default
+
+  # Backend #
+
+  app:
+    build:
+      args:
+        user: ${ARG_USER}
+        uid: ${ARG_UID}
+      context: app
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - DB_USER=${DB_USER}
+      - DB_NAME=${DB_NAME}
+      - DB_HOST=${DB_HOST}
+      - DB_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - ./app/www:/var/www
+    command: air
+    depends_on:
+      - db
+    networks:
+      - default
+
+networks:
+  default:
+    driver: bridge
