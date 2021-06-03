@@ -23,9 +23,6 @@ services:
 
   app:
     build:
-      args:
-        user: ${ARG_USER}
-        uid: ${ARG_UID}
       context: app
       dockerfile: Dockerfile
     ports:
